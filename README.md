@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -10,3 +11,7 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+=======
+# UI-Registration-Portal
+A responsive front-end user interface that allows users to register, log in, and apply for jobs. This project focuses purely on the UI/UX aspect, with clean design and smooth user interaction. technology React.js ,Appwrite,tailwind 
+>>>>>>> ca8a3d950d25ce4b27f1ab616a07a3f2df700760
