@@ -1,55 +1,109 @@
-import React from "react";
+// File: Contact.jsx
+
+import React, { useState } from "react";
+import { databases, account, ID } from "../appwriteConfig";
 
 const Contact = () => {
+  const DATABASE_ID = "687fd15100097e5ca692";      // Apna database ID yahan dalein
+  const COLLECTION_ID = "687fd3d6001425bba936";    // Apni collection ID yahan dalein
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // User login check karna
+      const user = await account.get();
+      const userId = user.$id;
+
+      // Document create karte waqt permissions me double quotes ke sath userId dena zaruri hai
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTION_ID,
+        ID.unique(),
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        },
+        [`read("user:${userId}")`],    // Correct permission format
+        [`write("user:${userId}")`]
+      );
+
+      alert("Message sent successfully!");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Submission error:", error);
+      if (error.code === 401) {
+        alert("Aap login nahi hain. Kripya login karen.");
+        // Optional: yahan login page par redirect kar sakte hain
+        // window.location.href = "/login";
+      } else {
+        alert("Message bhejne mein error aaya hai.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6">Contact Us</h1>
-      <div className="bg-white shadow-lg rounded-2xl p-6 max-w-2xl w-full">
-        <div className="flex flex-col md:flex-row items-center md:items-start">
-          <img
-            src='https://tse2.mm.bing.net/th?id=OIP.y4Pyvg0JBcZ3ytN71svRoQHaHa&pid=Api&P=0&h=180'
-            alt="Contact Us"
-            className="w-40 h-20 rounded-full mb-4 md:mb-0 md:mr-6"
-          />
-          <div>
-            <p className="text-gray-700">Feel free to reach out to us with any questions or inquiries.</p>
-            <p className="text-gray-700">Email: contact@example.com</p>
-            <p className="text-gray-700">Phone: (123) 456-7890</p>
-          </div>
-        </div>
-        <form className="mt-6">
-          <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
-            <input
-              type="text"
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Your Name"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Your Email"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Message</label>
-            <textarea
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Your Message"
-              rows="4"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-          >
-            Send Message
-          </button>
-        </form>
-      </div>
+    <div className="flex justify-center items-center py-10 px-4 bg-gray-100 min-h-screen">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg bg-white shadow-md rounded-2xl p-8 space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-center">Contact Us</h2>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border rounded-lg"
+        />
+
+        <textarea
+          name="message"
+          placeholder="Your Message"
+          value={formData.message}
+          onChange={handleChange}
+          required
+          rows={5}
+          className="w-full p-3 border rounded-lg"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          {loading ? "Sending..." : "Send Message"}
+        </button>
+      </form>
     </div>
   );
 };
