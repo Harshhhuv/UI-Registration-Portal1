@@ -11,7 +11,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      // 🔐 Create new account
+
       await account.create(ID.unique(), email, password, name);
       alert("Registration successful!");
       navigate("/login");

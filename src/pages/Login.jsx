@@ -2,31 +2,29 @@ import { useState } from "react";
 import { account } from "../appwriteConfig";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-
+import {Eye,EyeOff} from "lucide-react"
 const Login = () => {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const[showPassword,setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // ✅ Only try to delete session if it exists
+      
       try {
         await account.deleteSession("current");
       } catch (err) {
         console.warn("No session to delete:", err.message);
       }
-
-      // ✅ Create session
-      await account.createEmailSession(email, password);
-
-      // ✅ Fetch user
+      await account.createEmailPasswordSession(email, password);
       const userData = await account.get();
       setUser(userData);
 
-      // ✅ Redirect
+
       navigate("/home");
     } catch (error) {
       alert("Login failed: " + error.message);
@@ -50,14 +48,25 @@ const Login = () => {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-6 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+        <div className="relative mb-6">
+          <input
+            type={showPassword ? "text" : "password"}  // 🔶 toggle apply
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          {/* 🔶 EYE ICON BUTTON */}
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-2 text-gray-600"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         <button
           type="submit"
